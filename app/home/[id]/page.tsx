@@ -5,13 +5,14 @@ import { FaUser, FaFilter } from 'react-icons/fa'
 import { TodoItem } from '@/app/component/TodoItem'
 import LogOut from '@/app/component/LogOut'
 
-export default async function Home({ params }: { params: { id: string } }) {
+export default async function Home({ params }: { params: Promise<{ id: string }> }) {
   const prisma = new PrismaClient()
+  const id = (await params).id
   const user = await prisma.users.findFirst({
-    where: { UserID: parseInt(params.id) },
+    where: { UserID: parseInt(id) },
   })
   const todos = await prisma.todos.findMany({
-    where: { userId: parseInt(params.id) },
+    where: { userId: parseInt(id) },
     orderBy: { created_at: 'desc' },
   })
 
@@ -31,7 +32,7 @@ export default async function Home({ params }: { params: { id: string } }) {
       <section className="bg-white shadow-md p-6 rounded-xl mb-6 w-[60vw]">
         <h2 className="text-xl font-semibold mb-4">+ Add new task</h2>
         <form action={addTask} className="flex flex-col gap-4">
-          <input type="hidden" value={params.id} name="userId" />
+          <input type="hidden" value={id} name="userId" />
           <input
             type="text"
             name="title"
@@ -78,7 +79,7 @@ export default async function Home({ params }: { params: { id: string } }) {
             <li className="text-gray-500 text-center py-4">
               No tasks found.</li>)}
           {todos.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} userId={params.id} />
+            <TodoItem key={todo.id} todo={todo} userId={id} />
           ))}
         </ul>
       </section>
