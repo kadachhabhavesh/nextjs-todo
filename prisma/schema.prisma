@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model todos {
+  id          BigInt   @id @default(autoincrement())
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  update_at   DateTime @default(now()) @db.Timestamp(6)
+  title       String?  @default("") @db.VarChar
+  description String?  @default("") @db.VarChar
+  status      String?  @default("") @db.VarChar
+  userId      BigInt?
+  users       users?   @relation(fields: [userId], references: [UserID], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model users {
+  UserID     BigInt   @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  UserName   String?  @default("50") @db.VarChar
+  Password   String?  @default("300") @db.VarChar
+  todos      todos[]
+}
